@@ -1,0 +1,39 @@
+/* Get rid of all borders, margins, and padding. */
+* {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+/* Make the html/body 100% width and height. */
+html, body {
+  width: 100%;
+  width: 100%;
+}
+
+/* Place the canvas at the top left and make sure it displays block style.*/
+/* The canvas is (re)sized using JavaScript. */
+#plane {
+  top: 0;
+  left: 0;
+  display: block;
+  touch-action: none;
+  border: 1px solid black;
+}
+
+.point {
+  fill: rgb(255, 108, 95);
+}
+
+.line {
+  stroke: rgb(0, 174, 255);
+}
+
+.circle {
+  stroke: rgb(77, 197, 148);
+  fill: none;
+}
+
+.label {
+  fill:  rgb(142, 67, 231);
+}

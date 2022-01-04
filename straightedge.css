@@ -8,14 +8,17 @@
 /* Make the html/body 100% width and height. */
 html, body {
   width: 100%;
-  width: 100%;
+  overflow: hidden;
 }
 
 /* Place the canvas at the top left and make sure it displays block style.*/
 /* The canvas is (re)sized using JavaScript. */
 #plane {
+  position: fixed;
   top: 0;
   left: 0;
+  height: 100%;
+  width: 100%;
   display: block;
   touch-action: none;
   border: 1px solid black;

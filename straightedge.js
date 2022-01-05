@@ -19,13 +19,19 @@
   // Label font size.
   const labelfontsize = 14;
 
+  // Toolbar size.
+  const tb = 30;
+
+  // Circle mode is false, line mode is true.
+  let ui_mode = true;
+
   // SVG viewbox.
   let viewbox = [-400, -400, 800, 800];
 
   // Add SVG.
-  var vis = d3.select("#plane")
-  .attr("viewBox", viewbox.join(' '))
-  .attr("preserveAspectRatio", "xMinYMin meet");
+  let vis = d3.select("#plane")
+              .attr("viewBox", viewbox.join(' '))
+              .attr("preserveAspectRatio", "xMinYMin meet");
 
 
   /***************************************************************************
@@ -280,28 +286,50 @@
     .attr('font-size', labelfontsize)
     .text(function(d) { return d.label; });
 
-  // Draw the buttons.
-  let circle_button = vis.selectAll('.circle_button')
-     .data([{x: viewbox[0] + viewbox[2] - 40, y: viewbox[1] + viewbox[3] - 40}])
-     .enter()
-     .append('g')
-     .attr("transform", function(d) {return `translate(${d.x},${d.y})`;});
-  circle_button.append('circle')
-               .attr('cx', 10)
-               .attr('cy', 10)
-               .attr('r', 8)
-               .style('stroke', 'rgba(142, 67, 231, 0.5)')
-               .style('fill', 'white');
-  circle_button.append('circle')
-               .attr('cx', 10)
-               .attr('cy', 10)
-               .attr('r', 2)
-               .style('stroke', 'none')
-               .style('fill', 'rgb(0, 174, 255)');
-
-
   }
 
   paint();
+
+  /***************************************************************************
+   * Painting the toolbar.
+  ***************************************************************************/
+  function toolbar() {
+    // Create an SVG group for the toolbar.
+    let toolbar = vis.selectAll('.toolbar')
+                     .data([{x: viewbox[0], y: viewbox[1], width: viewbox[2], height: tb}])
+                     .enter()
+                     .append('g')
+                     .attr("transform", function(d) {return `translate(${d.x},${d.y})`;});
+    
+    // Draw the toolbar.
+    toolbar.append('rect')
+           .attr('x', 0)
+           .attr('y', 0)
+           .attr('width', function(d) {return d.width;})
+           .attr('height', function(d) {return d.height;})
+           .attr('class', 'toolbar');
+    
+    // Draw the circle button.
+    let circle_button = toolbar.selectAll('.circle_button')
+      .data([{order: 2, x: 0, y: 0, width: tb, height: tb}])
+      .enter()
+      .append('g')
+      .attr("transform", function(d) {return `translate(${d.x},${d.y})`;});
+    
+    circle_button.append('circle')
+                 .attr('cx', function(d) {return d.x + (d.width / 2);})
+                 .attr('cy', function(d) {return d.y + (d.height / 2);})
+                 .attr('r', function(d) {return (d.width / 2) - 2;})
+                 .style('stroke', 'rgba(142, 67, 231, 0.5)')
+                 .style('fill', 'white');
+    circle_button.append('circle')
+                 .attr('cx', function(d) {return d.x + (d.width / 2);})
+                 .attr('cy', function(d) {return d.y + (d.height / 2);})
+                 .attr('r', 4)
+                 .style('stroke', 'none')
+                 .style('fill', 'rgb(0, 174, 255)');
+  }
+
+  toolbar();
   
 // })(this);

@@ -15,7 +15,7 @@ html, body {
 /* The canvas is (re)sized using JavaScript. */
 #plane {
   position: fixed;
-  top: 0;
+  top: 40;
   left: 0;
   height: 100%;
   width: 100%;
@@ -39,4 +39,9 @@ html, body {
 
 .label {
   fill:  rgb(142, 67, 231);
+}
+
+.toolbar {
+  stroke: none;
+  fill: rgb(142, 67, 231, 0.5);
 }

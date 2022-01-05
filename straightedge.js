@@ -1,3 +1,4 @@
+
 // (function() {
 
   /***************************************************************************
@@ -28,10 +29,10 @@
   // SVG viewbox.
   let viewbox = [-400, -400, 800, 800];
 
-  // Add SVG.
-  let vis = d3.select("#plane")
-              .attr("viewBox", viewbox.join(' '))
-              .attr("preserveAspectRatio", "xMinYMin meet");
+  // Find the drawing svg.
+  let vis = d3.select('.plane')
+              .attr('viewBox', viewbox.join(' '))
+              .attr('preserveAspectRatio', 'xMinYMin meet');
 
 
   /***************************************************************************
@@ -165,35 +166,35 @@
   // Constructed points.
   let points = [
     {
-      label: "0"
+      label: '0'
       , x: 0
       , y: 0
       , labelx: -15
       , labely: 15
     }, 
     {
-      label: "1"
+      label: '1'
       , x: 100
       , y: 0
       , labelx: -15
       , labely: 15
     }, 
     {
-      label: "2"
+      label: '2'
       , x: 200
       , y: 0
       , labelx: -15
       , labely: 15
     },
     {
-      label: "A"
+      label: 'A'
       , x: 100
       , y: 100
       , labelx: -15
       , labely: 15
     },
     {
-      label: "B"
+      label: 'B'
       , x: 200
       , y: -100
       , labelx: -15
@@ -203,15 +204,15 @@
   
   // Constructed lines.
   let lines = [
-    ["0", "1"],
-    ["0", "A"],
-    ["1", "B"],
+    ['0', '1'],
+    ['0', 'A'],
+    ['1', 'B'],
   ];
 
   // Constructed circles.
   let circles = [
-    ["1", "0"],
-    ["0", "1"]
+    ['1', '0'],
+    ['0', '1']
   ];
     
 
@@ -246,26 +247,26 @@
   vis.selectAll('.line')
      .data(svg_lines)
      .enter()
-     .append("line")
+     .append('line')
      .attr('class', 'line')
-     .attr("x1", function(d) { return d.x1; })
-     .attr("y1", function(d) { return d.y1; })
-     .attr("x2", function(d) { return d.x2; })
-     .attr("y2", function(d) { return d.y2; })
-     .attr("stroke-width", thickness)
-     .attr("stroke-dasharray", dashes); 
+     .attr('x1', function(d) { return d.x1; })
+     .attr('y1', function(d) { return d.y1; })
+     .attr('x2', function(d) { return d.x2; })
+     .attr('y2', function(d) { return d.y2; })
+     .attr('stroke-width', thickness)
+     .attr('stroke-dasharray', dashes); 
   
   // Draw the circles.
   vis.selectAll('.circle')
      .data(svg_circles)
      .enter()
-     .append("circle")
+     .append('circle')
      .attr('class', 'circle')
-     .attr("cx", function(d) { return d.cx; })
-     .attr("cy", function(d) { return d.cy; })
-     .attr("r", function(d) { return d.r; })
-     .attr("stroke-width", thickness)
-     .attr("stroke-dasharray", dashes);
+     .attr('cx', function(d) { return d.cx; })
+     .attr('cy', function(d) { return d.cy; })
+     .attr('r', function(d) { return d.r; })
+     .attr('stroke-width', thickness)
+     .attr('stroke-dasharray', dashes);
   
   
   // Draw the points.
@@ -273,11 +274,11 @@
               .data(points)
               .enter()
               .append('g')
-              .attr("transform", function(d){return "translate(" + d.x + "," + d.y + ")"});
+              .attr('transform', function(d){return 'translate(' + d.x + ',' + d.y + ')'});
 
-  gs.append("circle")
+  gs.append('circle')
     .attr('class', 'point')
-    .attr("r", dotradius);
+    .attr('r', dotradius);
   
   gs.append('text')
     .attr('dx', function(d) { return d.labelx; })
@@ -291,45 +292,25 @@
   paint();
 
   /***************************************************************************
-   * Painting the toolbar.
+   * Toolbar.
   ***************************************************************************/
-  function toolbar() {
-    // Create an SVG group for the toolbar.
-    let toolbar = vis.selectAll('.toolbar')
-                     .data([{x: viewbox[0], y: viewbox[1], width: viewbox[2], height: tb}])
-                     .enter()
-                     .append('g')
-                     .attr("transform", function(d) {return `translate(${d.x},${d.y})`;});
-    
-    // Draw the toolbar.
-    toolbar.append('rect')
-           .attr('x', 0)
-           .attr('y', 0)
-           .attr('width', function(d) {return d.width;})
-           .attr('height', function(d) {return d.height;})
-           .attr('class', 'toolbar');
-    
-    // Draw the circle button.
-    let circle_button = toolbar.selectAll('.circle_button')
-      .data([{order: 2, x: 0, y: 0, width: tb, height: tb}])
-      .enter()
-      .append('g')
-      .attr("transform", function(d) {return `translate(${d.x},${d.y})`;});
-    
-    circle_button.append('circle')
-                 .attr('cx', function(d) {return d.x + (d.width / 2);})
-                 .attr('cy', function(d) {return d.y + (d.height / 2);})
-                 .attr('r', function(d) {return (d.width / 2) - 2;})
-                 .style('stroke', 'rgba(142, 67, 231, 0.5)')
-                 .style('fill', 'white');
-    circle_button.append('circle')
-                 .attr('cx', function(d) {return d.x + (d.width / 2);})
-                 .attr('cy', function(d) {return d.y + (d.height / 2);})
-                 .attr('r', 4)
-                 .style('stroke', 'none')
-                 .style('fill', 'rgb(0, 174, 255)');
+  // Status of straightedge situation.
+  let status_straightedge = {
+    active: false,
+    pointone: false,
+  }
+  
+  // The straightedge button.
+  function button_straightedge(e) {
+    let me = d3.select(this);
+    me.classed("toolbar-button-inactive", !me.classed("toolbar-button-inactive"));
+    me.classed("toolbar-button-active", !me.classed("toolbar-button-active"));
   }
 
-  toolbar();
+  d3.select('.button-straightedge')
+    .on('click', button_straightedge);
+
+
+
   
 // })(this);

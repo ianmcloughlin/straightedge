@@ -13,7 +13,7 @@ html, body {
 
 /* Place the canvas at the top left and make sure it displays block style.*/
 /* The canvas is (re)sized using JavaScript. */
-#plane {
+.plane {
   position: fixed;
   top: 40;
   left: 0;
@@ -26,6 +26,7 @@ html, body {
 
 .point {
   fill: rgb(255, 108, 95);
+  cursor: crosshair;
 }
 
 .line {
@@ -48,7 +49,7 @@ html, body {
   width: 100% !important; 
   height: 48px;
   border: 0 !important;
-  background-color: rgb(233, 233, 231) !important;
+  background-color: rgba(233, 233, 231, 0.8) !important;
   z-index: 9999999 !important;
 }
 

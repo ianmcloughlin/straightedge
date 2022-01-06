@@ -278,7 +278,8 @@
 
   gs.append('circle')
     .attr('class', 'point')
-    .attr('r', dotradius);
+    .attr('r', dotradius)
+    .on('click', point_click);
   
   gs.append('text')
     .attr('dx', function(d) { return d.labelx; })
@@ -296,9 +297,28 @@
   ***************************************************************************/
   // Status of straightedge situation.
   let status_straightedge = {
-    active: false,
-    pointone: false,
+    active: true,
+    pointone: null,
   }
+
+  // Point click handler.
+  function point_click(e) {
+    me = d3.select(this);
+    if (status_straightedge.pointone) {
+      if (status_straightedge.pointone !== me.datum().label) {
+        // Push line.
+        lines.push([status_straightedge.pointone, me.datum().label]);
+        // Clear status.
+        status_straightedge.active = false;
+        status_straightedge.pointone = null;
+        paint();
+      }
+    } else {
+      // Save point.
+      status_straightedge.pointone = me.datum().label;
+    }
+  }
+
   
   // The straightedge button.
   function button_straightedge(e) {
@@ -307,6 +327,7 @@
     me.classed("toolbar-button-active", !me.classed("toolbar-button-active"));
   }
 
+  // Attach the event to the straightedge button.
   d3.select('.button-straightedge')
     .on('click', button_straightedge);
 

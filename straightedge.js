@@ -162,176 +162,194 @@
   /***************************************************************************
    * Initial ponts, lines, and circles.
   ***************************************************************************/
-
-  // Constructed points.
-  let points = [
-    {
-      label: '0'
-      , x: 0
-      , y: 0
-      , labelx: -15
-      , labely: 15
-    }, 
-    {
-      label: '1'
-      , x: 100
-      , y: 0
-      , labelx: -15
-      , labely: 15
-    }, 
-    {
-      label: '2'
-      , x: 200
-      , y: 0
-      , labelx: -15
-      , labely: 15
-    },
-    {
-      label: 'A'
-      , x: 100
-      , y: 100
-      , labelx: -15
-      , labely: 15
-    },
-    {
-      label: 'B'
-      , x: 200
-      , y: -100
-      , labelx: -15
-      , labely: 15
-    },
-  ];
+  let cons = {
+    // Constructed points.
+    points: [
+      {
+        label: '0'
+        , x: 0
+        , y: 0
+        , labelx: -15
+        , labely: 15
+      }, 
+      {
+        label: '1'
+        , x: 100
+        , y: 0
+        , labelx: -15
+        , labely: 15
+      }, 
+      {
+        label: '2'
+        , x: 200
+        , y: 0
+        , labelx: -15
+        , labely: 15
+      },
+      {
+        label: 'A'
+        , x: 100
+        , y: 100
+        , labelx: -15
+        , labely: 15
+      },
+      {
+        label: 'B'
+        , x: 200
+        , y: -100
+        , labelx: -15
+        , labely: 15
+      },
+    ],
   
-  // Constructed lines.
-  let lines = [
-    ['0', '1'],
-    ['0', 'A'],
-    ['1', 'B'],
-  ];
+    // Constructed lines.
+    lines: [
+      ['0', '1'],
+      ['0', 'A'],
+      ['1', 'B'],
+    ],
 
-  // Constructed circles.
-  let circles = [
-    ['1', '0'],
-    ['0', '1']
-  ];
-    
+    // Constructed circles.
+    circles: [
+      ['1', '0'],
+      ['0', '1']
+    ],
+  };
 
   /***************************************************************************
    * Painting the ponts, lines, and circles.
   ***************************************************************************/
 
-  function paint() {
-
-    // The coordinates of the lines and circles in the SVG.
-    let svg_lines, svg_circles ;
-
-    // Calculate the SVG lines from the lines.
-    svg_lines = lines.map(line => {
+  function paint_circles() {
+    
+    // Calculate the SVG circles from the circles.
+    let svg_circles = cons.circles.map(circle => {
+    
       // Get the points with the labels in line.
-      let p1 = points.filter(obj => obj.label == line[0])[0];
-      let p2 = points.filter(obj => obj.label == line[1])[0];
-      // Calculate the extreme points.
-      return extreme_points(p1, p2);
-    });
-
-    // Calculate the SVG circles from the circles.  
-    svg_circles = circles.map(circle => {
-      // Get the points with the labels in line.
-      let p1 = points.filter(obj => obj.label == circle[0])[0];
-      let p2 = points.filter(obj => obj.label == circle[1])[0];
+      let p1 = cons.points.filter(obj => obj.label == circle[0])[0];
+      let p2 = cons.points.filter(obj => obj.label == circle[1])[0];
+    
       // Calculate the radius and centre.
       return centre_and_radius(p1, p2);
+    
     });
 
-  // Draw the lines.
-  vis.selectAll('.line')
-     .data(svg_lines)
-     .enter()
-     .append('line')
-     .attr('class', 'line')
-     .attr('x1', function(d) { return d.x1; })
-     .attr('y1', function(d) { return d.y1; })
-     .attr('x2', function(d) { return d.x2; })
-     .attr('y2', function(d) { return d.y2; })
-     .attr('stroke-width', thickness)
-     .attr('stroke-dasharray', dashes); 
-  
-  // Draw the circles.
-  vis.selectAll('.circle')
-     .data(svg_circles)
-     .enter()
-     .append('circle')
-     .attr('class', 'circle')
-     .attr('cx', function(d) { return d.cx; })
-     .attr('cy', function(d) { return d.cy; })
-     .attr('r', function(d) { return d.r; })
-     .attr('stroke-width', thickness)
-     .attr('stroke-dasharray', dashes);
-  
-  
-  // Draw the points.
-  let gs = vis.selectAll('.point')
-              .data(points)
-              .enter()
-              .append('g')
-              .attr('transform', function(d){return 'translate(' + d.x + ',' + d.y + ')'});
-
-  gs.append('circle')
-    .attr('class', 'point')
-    .attr('r', dotradius)
-    .on('click', point_click);
-  
-  gs.append('text')
-    .attr('dx', function(d) { return d.labelx; })
-    .attr('dy', function(d) { return d.labely; })
-    .attr('class', 'label')
-    .attr('font-size', labelfontsize)
-    .text(function(d) { return d.label; });
+    // Draw the circles.
+    vis.selectAll('.circle')
+       .data(svg_circles)
+       .enter()
+       .append('circle')
+       .attr('class', 'circle')
+       .attr('cx', d => d.cx)
+       .attr('cy', d => d.cy)
+       .attr('r', d => d.r)
+       .attr('stroke-width', thickness)
+       .attr('stroke-dasharray', dashes);
 
   }
 
-  paint();
+  function paint_lines() {
+    // Calculate the SVG circles from the circles.
+    
+    let svg_lines = cons.lines.map(line => {
+    
+      // Get the points with the labels in line.
+      let p1 = cons.points.filter(obj => obj.label == line[0])[0];
+      let p2 = cons.points.filter(obj => obj.label == line[1])[0];
+    
+      // Calculate the extreme points.
+      return extreme_points(p1, p2);
+    
+    });
+
+    // Draw the lines.
+    vis.selectAll('.line')
+       .data(svg_lines)
+       .enter()
+       .append('line')
+       .attr('class', 'line')
+       .attr('x1', d => d.x1)
+       .attr('y1', d => d.y1)
+       .attr('x2', d => d.x2)
+       .attr('y2', d => d.y2)
+       .attr('stroke-width', thickness)
+       .attr('stroke-dasharray', dashes); 
+  }
+
+  function paint_points() {
+    
+    // Group the points and the labels.
+    let gs = vis.selectAll('.point')
+                .data(cons.points)
+                .enter()
+                .append('g')
+                .attr('transform', d => `translate(${d.x},${d.y})`);
+
+    // Draw the points.
+    gs.append('circle')
+      .attr('class', 'point point_inactive')
+      .attr('r', dotradius);
+  
+    // Draw the labels.
+    gs.append('text')
+      .attr('dx', d => d.labelx)
+      .attr('dy', d => d.labely)
+      .attr('class', 'label')
+      .attr('font-size', labelfontsize)
+      .text(d => d.label);
+
+  }
+
+  function paint() {
+    d3.selectAll("svg > *").remove();
+    paint_circles();
+    paint_lines();
+    paint_points();
+    interactions();
+  }
+
+
 
   /***************************************************************************
-   * Toolbar.
+   * Interactions.
   ***************************************************************************/
-  // Status of straightedge situation.
-  let status_straightedge = {
-    active: true,
-    pointone: null,
+  let first_point = null;
+  let modes = ['point_inactive', 'point_active_line', 'point_active_circle'];
+  let mode = 0;
+
+  function interactions() {
+    vis.selectAll('.point')
+       .on('click', function(e, d) {
+        if (first_point == null || first_point == d.label) {
+          console.log("YES");
+          // Store this as the first point.
+          first_point = d.label;
+          // Demode.
+          d3.select(this).classed(`${modes[mode]}`, false);
+          // Remode.
+          mode = (mode + 1) % modes.length;
+          // Class it as active.
+          d3.select(this).classed(`${modes[mode]}`, true);
+        } else {
+          console.log("YES");
+          // Get this point.
+          let second_point = d.label;
+          if (mode === 1) {
+            cons.lines.push([first_point, second_point]);
+          } else if (mode === 2) {
+            cons.circles.push([first_point, second_point]);
+          }
+          first_point = null;
+          paint();
+        }
+
+       });
+
+
   }
 
-  // Point click handler.
-  function point_click(e) {
-    me = d3.select(this);
-    if (status_straightedge.pointone) {
-      if (status_straightedge.pointone !== me.datum().label) {
-        // Push line.
-        lines.push([status_straightedge.pointone, me.datum().label]);
-        // Clear status.
-        status_straightedge.active = false;
-        status_straightedge.pointone = null;
-        paint();
-      }
-    } else {
-      // Save point.
-      status_straightedge.pointone = me.datum().label;
-    }
-  }
 
-  
-  // The straightedge button.
-  function button_straightedge(e) {
-    let me = d3.select(this);
-    me.classed("toolbar-button-inactive", !me.classed("toolbar-button-inactive"));
-    me.classed("toolbar-button-active", !me.classed("toolbar-button-active"));
-  }
-
-  // Attach the event to the straightedge button.
-  d3.select('.button-straightedge')
-    .on('click', button_straightedge);
-
-
-
+  // Start the show.
+  paint();
   
 // })(this);

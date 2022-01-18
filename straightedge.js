@@ -1,12 +1,9 @@
-
+  
 // (function() {
 
   /***************************************************************************
    * Parameters and preliminaries for display.
   ***************************************************************************/
-
-  // Number of of SVG units between 0 and 1.
-  const unit = 100;
 
   // Line thickness.
   const thickness = 1;
@@ -25,14 +22,90 @@
 
   // Circle mode is false, line mode is true.
   let ui_mode = true;
+  
+  // The construction, in order.
+  let cons = [
+    {
+      type: 'point', 
+      label: '0',
+      x: 0,
+      y: 0,
+      labelx: -15,
+      labely: 15,
+    }, 
+    {
+      type: 'point',
+      label: '1',
+      x: 100,
+      y: 0,
+      labelx: -15,
+      labely: 15,
+    }, 
+    {
+      type: 'point',
+      label: '2',
+      x: 200,
+      y: 0,
+      labelx: -15,
+      labely: 15,
+    },
+    {
+      type: 'point',
+      label: 'A',
+      x: 100,
+      y: 100,
+      labelx: -15,
+      labely: 15,
+    },
+    {
+      type: 'point',
+      label: 'B',
+      x: 200,
+      y: -100,
+      labelx: -15,
+      labely: 15,
+    },
+    {
+      type: 'line',
+      point1: '0',
+      point2: '1',
+    },
+    {
+      type: 'line',
+      point1: '0',
+      point2: 'A',
+    },
+    {
+      type: 'line',
+      point1: '1',
+      point2: 'B',
+    },
+    {
+      type: 'circle',
+      centre: '1',
+      point: '0',
+    },
+    {
+      type: 'circle',
+      centre: '0',
+      point: '1',
+    },
+  ];
 
-  // SVG viewbox.
-  let viewbox = [-400, -400, 800, 800];
+  // SVG parameters.
+  let svg_params = {
+    viewbox: [-400, -400, 800, 800],
+    width: '100%', //5000,
+    height: '100%', //5000,
+  }
 
   // Find the drawing svg.
-  let vis = d3.select('.plane')
-              .attr('viewBox', viewbox.join(' '))
-              .attr('preserveAspectRatio', 'xMinYMin meet');
+  let vis = d3.select('.parent_of_plane')
+              .append("svg")
+              .attr("width", svg_params.width)
+              .attr("height", svg_params.height)
+              .attr('viewBox', svg_params.viewbox.join(' '));
+
 
 
   /***************************************************************************
@@ -107,8 +180,8 @@
     if (m === Infinity) {
 
       // The y values are just the top and bottom of the viewbox.
-      y1 = viewbox[1];
-      y2 = viewbox[1] + viewbox[3];
+      y1 = svg_params.viewbox[1];
+      y2 = svg_params.viewbox[1] + svg_params.viewbox[3];
       
       // The x values are the x intercept.
       x1 = c;
@@ -120,8 +193,8 @@
       if (Math.abs(m) > 1) {
         
         // The y values are the top and bottom of the viewbox.
-        y1 = viewbox[1];
-        y2 = viewbox[1] + viewbox[3];
+        y1 = svg_params.viewbox[1];
+        y2 = svg_params.viewbox[1] + svg_params.viewbox[3];
         
         // x = (y - c) / m
         x1 = (y1 - c) / m;
@@ -130,8 +203,8 @@
       } else {
         
         // The x values are the left and right of the viewbox.
-        x1 = viewbox[0];
-        x2 = viewbox[0] + viewbox[2];
+        x1 = svg_params.viewbox[0];
+        x2 = svg_params.viewbox[0] + svg_params.viewbox[2];
         
         // y = mx + c
         y1 = (m * x1) + c;
@@ -156,200 +229,149 @@
     return {cx: p1.x, cy: p1.y, r};
 
   }
-  
 
-  
-  /***************************************************************************
-   * Initial ponts, lines, and circles.
-  ***************************************************************************/
-  let cons = {
-    // Constructed points.
-    points: [
-      {
-        label: '0'
-        , x: 0
-        , y: 0
-        , labelx: -15
-        , labely: 15
-      }, 
-      {
-        label: '1'
-        , x: 100
-        , y: 0
-        , labelx: -15
-        , labely: 15
-      }, 
-      {
-        label: '2'
-        , x: 200
-        , y: 0
-        , labelx: -15
-        , labely: 15
-      },
-      {
-        label: 'A'
-        , x: 100
-        , y: 100
-        , labelx: -15
-        , labely: 15
-      },
-      {
-        label: 'B'
-        , x: 200
-        , y: -100
-        , labelx: -15
-        , labely: 15
-      },
-    ],
-  
-    // Constructed lines.
-    lines: [
-      ['0', '1'],
-      ['0', 'A'],
-      ['1', 'B'],
-    ],
-
-    // Constructed circles.
-    circles: [
-      ['1', '0'],
-      ['0', '1']
-    ],
-  };
 
   /***************************************************************************
    * Painting the ponts, lines, and circles.
   ***************************************************************************/
 
-  function paint_circles() {
-    
-    // Calculate the SVG circles from the circles.
-    let svg_circles = cons.circles.map(circle => {
-    
-      // Get the points with the labels in line.
-      let p1 = cons.points.filter(obj => obj.label == circle[0])[0];
-      let p2 = cons.points.filter(obj => obj.label == circle[1])[0];
-    
-      // Calculate the radius and centre.
-      return centre_and_radius(p1, p2);
-    
-    });
+  function paint_circle(circle) {
 
-    // Draw the circles.
-    vis.selectAll('.circle')
-       .data(svg_circles)
-       .enter()
-       .append('circle')
-       .attr('class', 'circle')
-       .attr('cx', d => d.cx)
-       .attr('cy', d => d.cy)
-       .attr('r', d => d.r)
+    // Get the centre and point.
+    let centre = cons.filter(obj => obj.label == circle.centre)[0];
+    let point = cons.filter(obj => obj.label == circle.point)[0];
+
+    let circle_svg = centre_and_radius(centre, point);
+    
+    // Draw the circle.
+    vis.append('circle')
+        .attr('class', 'circle')
+        .attr('cx', circle_svg.cx)
+        .attr('cy', circle_svg.cy)
+        .attr('r', circle_svg.r)
+        .attr('stroke-width', thickness)
+        .attr('stroke-dasharray', dashes);
+
+  }
+
+  function paint_line(line) {
+    
+    // Get the points with the labels in line.
+    let point1 = cons.filter(obj => obj.label == line.point1)[0];
+    let point2 = cons.filter(obj => obj.label == line.point2)[0];
+    
+    // Calculate the SVG parameters.
+    let line_svg = extreme_points(point1, point2);
+    
+    // Draw the line.
+    vis.append('line')
+       .attr('class', 'line')
+       .attr('x1', line_svg.x1)
+       .attr('y1', line_svg.y1)
+       .attr('x2', line_svg.x2)
+       .attr('y2', line_svg.y2)
        .attr('stroke-width', thickness)
        .attr('stroke-dasharray', dashes);
 
   }
 
-  function paint_lines() {
-    // Calculate the SVG circles from the circles.
+  function paint_point(point) {
     
-    let svg_lines = cons.lines.map(line => {
-    
-      // Get the points with the labels in line.
-      let p1 = cons.points.filter(obj => obj.label == line[0])[0];
-      let p2 = cons.points.filter(obj => obj.label == line[1])[0];
-    
-      // Calculate the extreme points.
-      return extreme_points(p1, p2);
-    
-    });
+    // Group the point and the label.
+    let g = vis.append('g')
+               .attr('class', 'point_group')
+               .attr('transform', `translate(${point.x},${point.y})`);
 
-    // Draw the lines.
-    vis.selectAll('.line')
-       .data(svg_lines)
-       .enter()
-       .append('line')
-       .attr('class', 'line')
-       .attr('x1', d => d.x1)
-       .attr('y1', d => d.y1)
-       .attr('x2', d => d.x2)
-       .attr('y2', d => d.y2)
-       .attr('stroke-width', thickness)
-       .attr('stroke-dasharray', dashes); 
-  }
-
-  function paint_points() {
-    
-    // Group the points and the labels.
-    let gs = vis.selectAll('.point')
-                .data(cons.points)
-                .enter()
-                .append('g')
-                .attr('transform', d => `translate(${d.x},${d.y})`);
-
-    // Draw the points.
-    gs.append('circle')
-      .attr('class', 'point point_inactive')
-      .attr('r', dotradius);
+    // Draw the point.
+    g.append('circle')
+     .attr('class', 'point point_inactive')
+     .attr('r', dotradius);
   
     // Draw the labels.
-    gs.append('text')
-      .attr('dx', d => d.labelx)
-      .attr('dy', d => d.labely)
-      .attr('class', 'label')
-      .attr('font-size', labelfontsize)
-      .text(d => d.label);
+    g.append('text')
+     .attr('dx', point.labelx)
+     .attr('dy', point.labely)
+     .attr('class', 'label')
+     .attr('font-size', labelfontsize)
+     .text(point.label);
 
   }
 
-  function paint() {
+  function repaint() {
     d3.selectAll("svg > *").remove();
-    paint_circles();
-    paint_lines();
-    paint_points();
-    interactions();
+
+    for (const shape of cons) {
+      switch (shape.type) {
+        case 'point':
+          paint_point(shape);
+          break;
+        case 'line':
+          paint_line(shape);
+          break;
+        case 'circle':
+          paint_circle(shape);
+          break;
+      }
+    }
+    raise_points()
   }
 
+  function paint(shape) {
+    switch (shape.type) {
+      case 'point':
+        paint_point(shape);
+        break;
+      case 'line':
+        paint_line(shape);
+        break;
+      case 'circle':
+        paint_circle(shape);
+        break;
+    }
+    raise_points()
+  }
+
+  function raise_points() {
+    d3.selectAll('.point_group').raise();
+  }
 
 
   /***************************************************************************
    * Interactions.
   ***************************************************************************/
-  let first_point = null;
+  let point1 = null;
   let modes = ['point_inactive', 'point_active_line', 'point_active_circle'];
   let mode = 0;
 
   function interactions() {
     vis.selectAll('.point')
        .on('click', function(e, d) {
-        if (first_point == null || first_point == d.label) {
-          console.log("YES");
-          // Store this as the first point.
-          first_point = d.label;
-          // Demode.
-          d3.select(this).classed(`${modes[mode]}`, false);
-          // Remode.
-          mode = (mode + 1) % modes.length;
-          // Class it as active.
-          d3.select(this).classed(`${modes[mode]}`, true);
-        } else {
-          console.log("YES");
-          // Get this point.
-          let second_point = d.label;
-          if (mode === 1) {
-            cons.lines.push([first_point, second_point]);
-          } else if (mode === 2) {
-            cons.circles.push([first_point, second_point]);
-          }
-          first_point = null;
-          paint();
-        }
-
+         if (point1 == null || point1 == d.label) {
+           // Store this as the first point.
+           point1 = d.label;
+           // Demode.
+           d3.select(this).classed(`${modes[mode]}`, false);
+           // Remode.
+           mode = (mode + 1) % modes.length;
+           // Class it as active.
+           d3.select(this).classed(`${modes[mode]}`, true);
+         } else {
+           // Get this point.
+           let point2 = d.label;
+           if (mode === 1) {
+             let shape = {type: 'line', point1, point2};
+           } else if (mode === 2) {
+             let shape = {type: 'circle', centre: point1, point: point2};
+           }
+           cons.push(shape);
+           paint(shape);
+           point1 = null;
+         }
        });
-
-
   }
 
 
   // Start the show.
-  paint();
+  repaint();
   
 // })(this);

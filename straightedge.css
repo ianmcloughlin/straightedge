@@ -11,18 +11,15 @@ html, body {
   overflow: hidden;
 }
 
-/* Place the canvas at the top left and make sure it displays block style.*/
-/* The canvas is (re)sized using JavaScript. */
-.plane {
-  position: fixed;
-  top: 40;
-  left: 0;
-  height: 100%;
+.parent_of_plane {
   width: 100%;
-  display: block;
-  touch-action: none;
-  border: 1px solid black;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: scroll;
 }
+
 
 .line {
   stroke: rgb(0, 174, 255);

@@ -9,10 +9,10 @@
   const thickness = 1;
   
   // Line dashes.
-  const dashes = 14;
+  const dashes = 5;
   
   // Radius of a point.
-  const dotradius = 5;
+  const dotradius = 10;
   
   // Label font size.
   const labelfontsize = 14;
@@ -94,9 +94,14 @@
 
   // SVG parameters.
   let svg_params = {
-    viewbox: [-400, -400, 800, 800],
-    width: '100%', //5000,
-    height: '100%', //5000,
+    viewbox: {
+      minx: -200,
+      miny: -200,
+      width: 500,
+      height: 500,
+    },
+    width: window.innerWidth, // '100%', //5000,
+    height: window.innerHeight, //'100%', //5000,
   }
 
   // Find the drawing svg.
@@ -104,7 +109,7 @@
               .append("svg")
               .attr("width", svg_params.width)
               .attr("height", svg_params.height)
-              .attr('viewBox', svg_params.viewbox.join(' '));
+              .attr('viewBox', `${svg_params.viewbox.minx},${svg_params.viewbox.miny},${svg_params.viewbox.width},${svg_params.viewbox.height}`);
 
 
 
@@ -180,8 +185,8 @@
     if (m === Infinity) {
 
       // The y values are just the top and bottom of the viewbox.
-      y1 = svg_params.viewbox[1];
-      y2 = svg_params.viewbox[1] + svg_params.viewbox[3];
+      y1 = svg_params.viewbox.miny;
+      y2 = svg_params.viewbox.miny + svg_params.viewbox.height;
       
       // The x values are the x intercept.
       x1 = c;
@@ -192,9 +197,9 @@
       // If the line is steep then use the y's as inputs.
       if (Math.abs(m) > 1) {
         
-        // The y values are the top and bottom of the viewbox.
-        y1 = svg_params.viewbox[1];
-        y2 = svg_params.viewbox[1] + svg_params.viewbox[3];
+      // The y values are just the top and bottom of the viewbox.
+      y1 = svg_params.viewbox.miny;
+      y2 = svg_params.viewbox.miny + svg_params.viewbox.height;
         
         // x = (y - c) / m
         x1 = (y1 - c) / m;
@@ -203,8 +208,8 @@
       } else {
         
         // The x values are the left and right of the viewbox.
-        x1 = svg_params.viewbox[0];
-        x2 = svg_params.viewbox[0] + svg_params.viewbox[2];
+        x1 = svg_params.viewbox.minx;
+        x2 = svg_params.viewbox.minx + svg_params.viewbox.width;
         
         // y = mx + c
         y1 = (m * x1) + c;
@@ -245,12 +250,13 @@
     
     // Draw the circle.
     vis.append('circle')
-        .attr('class', 'circle')
-        .attr('cx', circle_svg.cx)
-        .attr('cy', circle_svg.cy)
-        .attr('r', circle_svg.r)
-        .attr('stroke-width', thickness)
-        .attr('stroke-dasharray', dashes);
+       .datum(circle)
+       .attr('class', 'circle')
+       .attr('cx', circle_svg.cx)
+       .attr('cy', circle_svg.cy)
+       .attr('r', circle_svg.r)
+       .attr('stroke-width', thickness)
+       .attr('stroke-dasharray', dashes);
 
   }
 
@@ -265,6 +271,7 @@
     
     // Draw the line.
     vis.append('line')
+       .datum(line)
        .attr('class', 'line')
        .attr('x1', line_svg.x1)
        .attr('y1', line_svg.y1)
@@ -279,19 +286,21 @@
     
     // Group the point and the label.
     let g = vis.append('g')
-               .attr('class', 'point_group')
+               .datum(point)
+               .classed('point_group', true)
+               .classed('point_inactive', true)
                .attr('transform', `translate(${point.x},${point.y})`);
 
     // Draw the point.
     g.append('circle')
-     .attr('class', 'point point_inactive')
+     .classed('point', true)
      .attr('r', dotradius);
   
     // Draw the labels.
     g.append('text')
      .attr('dx', point.labelx)
      .attr('dy', point.labely)
-     .attr('class', 'label')
+     .classed('label', true)
      .attr('font-size', labelfontsize)
      .text(point.label);
 
@@ -313,7 +322,8 @@
           break;
       }
     }
-    raise_points()
+    raise_points();
+    interactions();
   }
 
   function paint(shape) {
@@ -328,7 +338,8 @@
         paint_circle(shape);
         break;
     }
-    raise_points()
+    raise_points();
+    interactions();
   }
 
   function raise_points() {
@@ -339,33 +350,49 @@
   /***************************************************************************
    * Interactions.
   ***************************************************************************/
+  // The already selected point (null if none).
   let point1 = null;
+  // The possible modes (css classes).
   let modes = ['point_inactive', 'point_active_line', 'point_active_circle'];
+  // The current mode.
   let mode = 0;
 
   function interactions() {
-    vis.selectAll('.point')
+    vis.selectAll('.point_group')
        .on('click', function(e, d) {
          if (point1 == null || point1 == d.label) {
            // Store this as the first point.
            point1 = d.label;
            // Demode.
            d3.select(this).classed(`${modes[mode]}`, false);
-           // Remode.
+           // Change mode.
            mode = (mode + 1) % modes.length;
-           // Class it as active.
+           // Remode.
            d3.select(this).classed(`${modes[mode]}`, true);
          } else {
+           // The shape to be drawn. 
+           let shape;
            // Get this point.
            let point2 = d.label;
+           // Mode 1 is a line.
            if (mode === 1) {
-             let shape = {type: 'line', point1, point2};
+             shape = {type: 'line', point1, point2};
+           // Mode 2 is a circle.
            } else if (mode === 2) {
-             let shape = {type: 'circle', centre: point1, point: point2};
+             shape = {type: 'circle', centre: point1, point: point2};
            }
+           // Push the shape to the shape list.
            cons.push(shape);
+           // Paint the shape.
            paint(shape);
+           // Clear the first point.
            point1 = null;
+           // Demode.
+           d3.selectAll('.point_group').classed(`${modes[mode]}`, false);
+           // Reset the mode to zero.
+           mode = 0;
+           // Remode.
+           d3.selectAll('.point_group').classed(`${modes[mode]}`, true);
          }
        });
   }

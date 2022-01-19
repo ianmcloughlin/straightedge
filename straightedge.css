@@ -34,18 +34,18 @@ html, body {
   fill:  rgb(142, 67, 231);
 }
 
-.point {
+.point_group {
   cursor: crosshair;
 }
 
-.point_inactive {
+.point_inactive > circle, .point_inactive > text {
   fill: rgb(142, 67, 231);
 }
 
-.point_active_circle {
+.point_active_circle > circle, .point_active_circle > text {
   fill: rgb(255, 108, 95) !important;
 }
 
-.point_active_line {
+.point_active_line > circle, .point_active_line > text {
   fill: rgb(28, 199, 208) !important;
 }

@@ -4,24 +4,6 @@
   /***************************************************************************
    * Parameters and preliminaries for display.
   ***************************************************************************/
-
-  // Line thickness.
-  const thickness = 1;
-  
-  // Line dashes.
-  const dashes = 5;
-  
-  // Radius of a point.
-  const dotradius = 10;
-  
-  // Label font size.
-  const labelfontsize = 14;
-
-  // Toolbar size.
-  const tb = 30;
-
-  // Circle mode is false, line mode is true.
-  let ui_mode = true;
   
   // The construction, in order.
   let cons = [
@@ -97,8 +79,8 @@
     viewbox: {
       minx: -200,
       miny: -200,
-      width: 500,
-      height: 500,
+      width: 600,
+      height: 600,
     },
     width: window.innerWidth, // '100%', //5000,
     height: window.innerHeight, //'100%', //5000,
@@ -108,10 +90,10 @@
   let vis = d3.select('.parent_of_plane')
               .append("svg")
               .attr("width", svg_params.width)
-              .attr("height", svg_params.height)
+              //.attr("height", svg_params.height)
               .attr('viewBox', `${svg_params.viewbox.minx},${svg_params.viewbox.miny},${svg_params.viewbox.width},${svg_params.viewbox.height}`);
 
-
+  console.log(window.innerWidth / window.innerHeight);
 
   /***************************************************************************
    * Functions for geometry etc.
@@ -254,9 +236,7 @@
        .attr('class', 'circle')
        .attr('cx', circle_svg.cx)
        .attr('cy', circle_svg.cy)
-       .attr('r', circle_svg.r)
-       .attr('stroke-width', thickness)
-       .attr('stroke-dasharray', dashes);
+       .attr('r', circle_svg.r);
 
   }
 
@@ -276,9 +256,7 @@
        .attr('x1', line_svg.x1)
        .attr('y1', line_svg.y1)
        .attr('x2', line_svg.x2)
-       .attr('y2', line_svg.y2)
-       .attr('stroke-width', thickness)
-       .attr('stroke-dasharray', dashes);
+       .attr('y2', line_svg.y2);
 
   }
 
@@ -294,14 +272,13 @@
     // Draw the point.
     g.append('circle')
      .classed('point', true)
-     .attr('r', dotradius);
+     .attr('r', 6);
   
     // Draw the labels.
     g.append('text')
      .attr('dx', point.labelx)
      .attr('dy', point.labely)
      .classed('label', true)
-     .attr('font-size', labelfontsize)
      .text(point.label);
 
   }
@@ -357,48 +334,55 @@
   // The current mode.
   let mode = 0;
 
-  function interactions() {
-    vis.selectAll('.point_group')
-       .on('click', function(e, d) {
-         if (point1 == null || point1 == d.label) {
-           // Store this as the first point.
-           point1 = d.label;
-           // Demode.
-           d3.select(this).classed(`${modes[mode]}`, false);
-           // Change mode.
-           mode = (mode + 1) % modes.length;
-           // Remode.
-           d3.select(this).classed(`${modes[mode]}`, true);
-         } else {
-           // The shape to be drawn. 
-           let shape;
-           // Get this point.
-           let point2 = d.label;
-           // Mode 1 is a line.
-           if (mode === 1) {
-             shape = {type: 'line', point1, point2};
-           // Mode 2 is a circle.
-           } else if (mode === 2) {
-             shape = {type: 'circle', centre: point1, point: point2};
-           }
-           // Push the shape to the shape list.
-           cons.push(shape);
-           // Paint the shape.
-           paint(shape);
-           // Clear the first point.
-           point1 = null;
-           // Demode.
-           d3.selectAll('.point_group').classed(`${modes[mode]}`, false);
-           // Reset the mode to zero.
-           mode = 0;
-           // Remode.
-           d3.selectAll('.point_group').classed(`${modes[mode]}`, true);
-         }
-       });
+  // For handling clicks on points.
+  function click_handler(e, d) {
+    if (point1 == null || point1 == d.label) {
+      // Store this as the first point.
+      point1 = d.label;
+      // Demode.
+      d3.select(this).classed(`${modes[mode]}`, false);
+      // Change mode.
+      mode = (mode + 1) % modes.length;
+      // Remode.
+      d3.select(this).classed(`${modes[mode]}`, true);
+      // If mode is 0 then point is deselected.
+      if (mode === 0)
+        point1 = null;
+    } else {
+      // The shape to be drawn. 
+      let shape;
+      // Get this point.
+      let point2 = d.label;
+      // Mode 1 is a line.
+      if (mode === 1) {
+        shape = {type: 'line', point1, point2};
+      // Mode 2 is a circle.
+      } else if (mode === 2) {
+        shape = {type: 'circle', centre: point1, point: point2};
+      }
+      // Push the shape to the shape list.
+      cons.push(shape);
+      // Paint the shape.
+      paint(shape);
+      // Clear the first point.
+      point1 = null;
+      // Demode.
+      d3.selectAll('.point_group').classed(`${modes[mode]}`, false);
+      // Reset the mode to zero.
+      mode = 0;
+      // Remode.
+      d3.selectAll('.point_group').classed(`${modes[mode]}`, true);
+    }
+    console.log(`point1 is ${point1}`);
   }
 
+  function interactions() {
+    vis.selectAll('.point_group').on('click', click_handler);
+  }
 
-  // Start the show.
+  /***************************************************************************
+   * Start the show.
+  ***************************************************************************/
   repaint();
   
 // })(this);

@@ -5,10 +5,9 @@
   padding: 0;
 }
 
-/* Make the html/body 100% width and height. */
 html, body {
   width: 100%;
-  overflow: hidden;
+  height: 100%;
 }
 
 .parent_of_plane {
@@ -22,16 +21,22 @@ html, body {
 
 
 .line {
-  stroke: rgb(0, 174, 255);
+  stroke: rgba(0, 174, 255, 0.7);
+  stroke-width: 1px;
+  fill: none;
+  stroke-dasharray: 5, 3;
 }
 
 .circle {
-  stroke: rgb(77, 197, 148);
+  stroke: rgba(77, 197, 148, 0.7);
+  stroke-width: 1px;
   fill: none;
+  stroke-dasharray: 5, 3;
 }
 
 .label {
-  fill:  rgb(142, 67, 231);
+  fill:  rgba(142, 67, 231, 0.7);
+  font-size: 10pt;
 }
 
 .point_group {
@@ -39,13 +44,13 @@ html, body {
 }
 
 .point_inactive > circle, .point_inactive > text {
-  fill: rgb(142, 67, 231);
+  fill: rgba(142, 67, 231, 0.7);
 }
 
 .point_active_circle > circle, .point_active_circle > text {
-  fill: rgb(255, 108, 95) !important;
+  fill: rgba(255, 108, 95, 0.7) !important;
 }
 
 .point_active_line > circle, .point_active_line > text {
-  fill: rgb(28, 199, 208) !important;
+  fill: rgba(28, 199, 208, 0.7) !important;
 }

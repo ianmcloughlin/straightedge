@@ -79,8 +79,8 @@
     viewbox: {
       minx: -200,
       miny: -200,
-      width: 600,
-      height: 600,
+      width: 1000,
+      height: 1000,
     },
     width: window.innerWidth, // '100%', //5000,
     height: window.innerHeight, //'100%', //5000,
@@ -93,11 +93,11 @@
               //.attr("height", svg_params.height)
               .attr('viewBox', `${svg_params.viewbox.minx},${svg_params.viewbox.miny},${svg_params.viewbox.width},${svg_params.viewbox.height}`);
 
-  console.log(window.innerWidth / window.innerHeight);
-
   /***************************************************************************
    * Functions for geometry etc.
   ***************************************************************************/
+
+
 
   // Slope and y-intercept of line from two points - checks for vertical lines.
   function equation_of_line(p1, p2) {    
@@ -204,6 +204,7 @@
     return {x1, x2, y1, y2};
   }
 
+
   // Centre and radius of a circle from two points in an array.
   function centre_and_radius(p1, p2) {
   
@@ -216,6 +217,14 @@
     return {cx: p1.x, cy: p1.y, r};
 
   }
+
+  // Resize the viewbox.
+  function viewbox_resize() {
+    vis.selectAll('.circle').each(function(d, i) {
+      console.log(d);
+    });
+  }
+
 
 
   /***************************************************************************
@@ -373,7 +382,6 @@
       // Remode.
       d3.selectAll('.point_group').classed(`${modes[mode]}`, true);
     }
-    console.log(`point1 is ${point1}`);
   }
 
   function interactions() {
@@ -384,5 +392,7 @@
    * Start the show.
   ***************************************************************************/
   repaint();
+
+  viewbox_resize()
   
 // })(this);

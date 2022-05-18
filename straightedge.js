@@ -79,8 +79,8 @@
     viewbox: {
       minx: -200,
       miny: -200,
-      width: 1000,
-      height: 1000,
+      width: (window.innerWidth / window.innerHeight) * Math.max(1000, window.innerWidth),//1000,
+      height: Math.max(1000, window.innerHeight),//1000,
     },
     width: window.innerWidth, // '100%', //5000,
     height: window.innerHeight, //'100%', //5000,
@@ -90,7 +90,7 @@
   let vis = d3.select('.parent_of_plane')
               .append("svg")
               .attr("width", svg_params.width)
-              //.attr("height", svg_params.height)
+              .attr("height", svg_params.height)
               .attr('viewBox', `${svg_params.viewbox.minx},${svg_params.viewbox.miny},${svg_params.viewbox.width},${svg_params.viewbox.height}`);
 
   /***************************************************************************
